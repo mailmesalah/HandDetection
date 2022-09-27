@@ -1,0 +1,345 @@
+int bIndx;
+        double bigV;
+        int jj;
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            
+            if (borderPs.Count > 2)
+            {
+                
+                //Checking angle for biggest value
+                r = borderPs.ElementAt(jj);
+                double tempV = CHandDetection.getAngle(p, q, r);
+                Console.WriteLine("Angle="+tempV);
+                if (bigV < tempV)
+                {
+                    bigV = tempV;
+                    bIndx = jj;
+                }
+                //Increment j in cyclic order               
+                ++jj;
+                if (jj == borderPs.Count)
+                {
+                    jj = 0;
+                }
+
+
+                if (borderPs.ElementAt(jj) == firstP)
+                {
+
+                    //Adding the Selected Point to the Hull
+                    convexHull.Add(borderPs.ElementAt(bIndx));
+                    //Take that r point as next q, and q as p 
+                    k = bIndx;
+                    p = q;
+                    q = borderPs.ElementAt(bIndx);
+                    lastP = q;
+
+                    ++k;
+                    if (k == borderPs.Count)
+                    {
+                        k = 0;
+                    }
+
+                    bIndx = k;
+                    bigV = 0;
+                    jj = k;
+
+                }
+
+                Bitmap tt = (Bitmap)bm.Clone();
+                using (Graphics g = Graphics.FromImage(tt))
+                {
+                    Pen pp = new Pen(Color.Blue, 2);
+                    g.DrawLine(pp, p, q);
+                    g.DrawLine(pp, q, r);
+                }
+                Console.WriteLine("p=" + p + "q=" + q + "r=" + r);
+                processedCameraFrame.Image = tt;
+
+
+            }
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine(conts.Count);
+            if (conts.Count > 0)
+            {
+                bm = (Bitmap)mFrame.Clone();
+                processedCameraFrame.Image = bm;
+                convexHull = new List<System.Drawing.Point>();
+                Contour border = conts.ElementAt(0);
+                camera.Stop();
+                borderPs = border.getContours();
+            }
+            
+            if (borderPs.Count > 2)
+            {
+                q = borderPs.ElementAt(0);
+                int index = 0;
+                //find left most X to find point p
+                for (int i = 1; i < borderPs.Count; i++)
+                {
+                    System.Drawing.Point temp = borderPs.ElementAt(i);
+                    if (temp.X < q.X)
+                    {
+                        q = temp;
+                        index = i;
+                    }
+                }
+                //increment y and find another point q
+                convexHull.Add(q);
+                p = new System.Drawing.Point(q.X, q.Y + 1);
+
+                k = index + 1;
+                if (k == borderPs.Count)
+                {
+                    k = 0;
+                }
+                r = borderPs.ElementAt(k);
+
+                //Iterate through the other points as r and find the biggest angle it makes.
+                firstP = q;
+                lastP = r;
+
+                bIndx = k;
+                bigV = 0;
+                jj = k;
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (borderPs.Count > 2)
+            {
+
+
+                    while (borderPs.ElementAt(jj) != firstP)
+                    {
+                        //Checking angle for biggest value
+                        r = borderPs.ElementAt(jj);
+                        double tempV = CHandDetection.getAngle(p, q, r);
+                        //Console.WriteLine("Angle=" + tempV);
+                        if (bigV < tempV)
+                        {
+                            bigV = tempV;
+                            bIndx = jj;
+                        }
+                        //Increment j in cyclic order               
+                        ++jj;
+                        if (jj == borderPs.Count)
+                        {
+                            jj = 0;
+                        }
+                    }
+                    
+                    //Adding the Selected Point to the Hull
+                    convexHull.Add(borderPs.ElementAt(bIndx));
+                    //Take that r point as next q, and q as p 
+                    k = bIndx;
+                    p = q;
+                    q = borderPs.ElementAt(bIndx);
+                    lastP = q;
+
+                    ++k;
+                    if (k == borderPs.Count)
+                    {
+                        k = 0;
+                    }
+
+                    bIndx = k;
+                    bigV = 0;
+                    jj = k;            
+                
+  
+
+                Bitmap tt = (Bitmap)bm.Clone();
+                Console.WriteLine("Step by Step Hull Point Start +++++++++++++++");
+                Console.WriteLine("Hull Point " + convexHull.ElementAt(0));
+                for (int i = 0; i < convexHull.Count-1; i++)
+                {
+                    using (Graphics g = Graphics.FromImage(tt))
+                    {
+                        Pen pp = new Pen(Color.Green, 2);
+                        g.DrawLine(pp, convexHull.ElementAt(i), convexHull.ElementAt(i+1));                     
+                    }
+                    Console.WriteLine("Hull Point " + convexHull.ElementAt(i+1));
+                }
+                Console.WriteLine("Step by Step Hull Point End +++++++++++++++");
+                //Console.WriteLine("p=" + p + "q=" + q + "r=" + r);
+                processedCameraFrame.Image = tt;
+
+
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine(conts.Count);
+            if (conts.Count > 0)
+            {
+                bm = (Bitmap)mFrame.Clone();
+                processedCameraFrame.Image = bm;
+                convexHull = new List<System.Drawing.Point>();
+                Contour border = conts.ElementAt(0);            
+                borderPs = border.getContours();
+            }
+
+            if (borderPs.Count > 2)
+            {
+                q = borderPs.ElementAt(0);
+                int index = 0;
+                //find left most X to find point p
+                for (int i = 1; i < borderPs.Count; i++)
+                {
+                    System.Drawing.Point temp = borderPs.ElementAt(i);
+                    if (temp.X < q.X)
+                    {
+                        q = temp;
+                        index = i;
+                    }
+                }
+                //increment y and find another point q
+                convexHull.Add(q);
+                p = new System.Drawing.Point(q.X, q.Y + 1);
+
+                k = index + 1;
+                if (k == borderPs.Count)
+                {
+                    k = 0;
+                }
+                r = borderPs.ElementAt(k);
+
+                //Iterate through the other points as r and find the biggest angle it makes.
+                firstP = q;
+                lastP = r;
+
+                bIndx = k;
+                bigV = 0;
+                jj = k;
+            }
+
+            if (borderPs.Count > 2)
+            {
+
+                while (firstP != lastP)
+                {
+                    int count=0;
+                    while (count<borderPs.Count)
+                    {
+                        //Checking angle for biggest value
+                        r = borderPs.ElementAt(jj);
+                        double tempV = CHandDetection.getAngle(p, q, r);
+                        //Console.WriteLine("Angle=" + tempV);
+                        if (bigV < tempV)
+                        {
+                            bigV = tempV;
+                            bIndx = jj;
+                        }
+                        //Increment j in cyclic order               
+                        ++jj;
+                        if (jj == borderPs.Count)
+                        {
+                            jj = 0;
+                        }
+                        ++count;
+                    }
+
+                    //Adding the Selected Point to the Hull
+                    convexHull.Add(borderPs.ElementAt(bIndx));
+                    //Take that r point as next q, and q as p 
+                    k = bIndx;
+                    p = q;
+                    q = borderPs.ElementAt(bIndx);
+                    lastP = q;
+
+                    ++k;
+                    if (k == borderPs.Count)
+                    {
+                        k = 0;
+                    }
+
+                    bIndx = k;
+                    bigV = 0;
+                    jj = k;
+                }
+
+
+                Bitmap tt = (Bitmap)bm.Clone();
+                Console.WriteLine("Hull Point Start********************");
+                Console.WriteLine("Hull Point " + convexHull.ElementAt(0));
+                for (int i = 0; i < convexHull.Count - 1; i++)
+                {
+                    using (Graphics g = Graphics.FromImage(tt))
+                    {
+                        Pen pp = new Pen(Color.Red, 2);
+                        g.DrawLine(pp, convexHull.ElementAt(i), convexHull.ElementAt(i + 1));
+                    }
+                    Console.WriteLine("Hull Point " + convexHull.ElementAt(i+1));
+                }
+                Console.WriteLine("Hull Point End********************");
+                //Console.WriteLine("p=" + p + "q=" + q + "r=" + r);
+                processedCameraFrame.Image = tt;
+
+            }
+        }
+
+
+
+
+if (processed)
+            {
+                processed = false;
+                try
+                {
+                    mFrame = (Bitmap)eventArgs.Frame.Clone();
+                    //BitmapData objectsData = mFrame.LockBits(new Rectangle(0, 0, mFrame.Width, mFrame.Height),ImageLockMode.ReadOnly, mFrame.PixelFormat);                                
+                    int[,] arr = CHandDetection.binirizeByColoursOnRangeToIntArray(mFrame, 80, 255, 85, 135, 135, 180);
+                    conts = CHandDetection.getContoursFromBinirizedIntArray(arr, 20);
+
+                    //Console.WriteLine("Conts "+conts.Count);
+                    foreach (Contour c in conts)
+                    {
+                        List<System.Drawing.Point> ps = c.getContours();
+                        foreach (System.Drawing.Point p in ps)
+                        {
+                            mFrame.SetPixel(p.X, p.Y, Color.Blue);
+                        }
+                        
+                        List<ConvexHullPoint> hullP = CHandDetection.getConvexHull(c);
+                        List<ConvexityDefectPoint> convD = CHandDetection.getConvexityDefects(c,hullP);
+                        using (Graphics g = Graphics.FromImage(mFrame))
+                        {
+                            for (int i = 0; i < hullP.Count-1; i++)
+                            {                                
+                                Pen ppp = new Pen(Color.Red, 2);
+                                Pen ppg = new Pen(Color.Green, 2);
+                                Pen ppy = new Pen(Color.Yellow, 2);
+                                g.DrawLine(ppp, hullP.ElementAt(i).chPoint, hullP.ElementAt(i+1).chPoint);
+                                //g.DrawEllipse(ppp, hullP.ElementAt(i).chPoint.X, hullP.ElementAt(i).chPoint.Y, 2, 2);
+                                if (i < convD.Count)
+                                {
+                                    g.DrawEllipse(ppy, convD.ElementAt(i).defectPoint.X, convD.ElementAt(i).defectPoint.Y, 2, 2);
+                                    
+                                }
+
+                                if (i == 0)
+                                {
+                                    g.DrawEllipse(ppg, c.getCenterPoint().X, c.getCenterPoint().Y, 2, 2);
+                                }
+                            }
+                        }
+                        
+                    }
+
+                    //mFrame.UnlockBits(objectsData);
+                    //processedCameraFrame.Image = mFrame;
+                    rawCameraFrame.Image = mFrame;
+
+                }
+                catch (Exception e) { Console.WriteLine(e.Message); }
+                processed = true;
+            }
